@@ -223,6 +223,9 @@ hw_bt_device_model get_hw_bt_device_model(void)
         return BT_WCN2243;
     }
 #endif
+#ifdef CONFIG_JSR_KERNEL
+    return BT_WCN2243;
+#endif
     return BT_UNKNOWN;
 }
 
