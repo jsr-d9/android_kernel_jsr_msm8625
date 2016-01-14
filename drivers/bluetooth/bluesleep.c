@@ -873,7 +873,11 @@ MODULE_LICENSE("GPL");
 #define VERSION		"1.1"
 #define PROC_DIR	"bluetooth/sleep"
 
+#ifdef CONFIG_HUAWEI_KERNEL
 #define BT_BLUEDROID_SUPPORT 1
+#else
+#define BT_BLUEDROID_SUPPORT 0
+#endif
 
 struct bluesleep_info {
 	unsigned host_wake;
@@ -992,7 +996,7 @@ void bluesleep_sleep_wakeup(void)
 		/*Activating UART */
 		hsuart_power(1);
 	}
- #ifdef CONFIG_HUAWEI_KERNEL
+ #if defined(CONFIG_HUAWEI_KERNEL) || defined(CONFIG_JSR_KERNEL)
  else
  {
      /*Tx idle, Rx busy, we must also make host_wake asserted, that is low
