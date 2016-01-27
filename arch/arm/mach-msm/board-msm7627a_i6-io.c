@@ -39,10 +39,6 @@
 #define MACHINE_IS_JSR_I6Q  \
  (machine_is_msm8625_skud())
 
-#ifdef CONFIG_LEDS_TRICOLOR_FLAHSLIGHT
-#undef CONFIG_LEDS_TRICOLOR_FLAHSLIGHT
-#endif
-
 
  
 static int tp_id = 0;
