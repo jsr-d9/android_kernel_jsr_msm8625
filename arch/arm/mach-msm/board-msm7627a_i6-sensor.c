@@ -218,6 +218,17 @@ static struct i2c_board_info mxc_i2c0_board_info[]__initdata={
 };
 #endif
 
+#if defined(CONFIG_INPUT_YAS_MAGNETOMETER) && defined(CONFIG_INPUT_YAS_ACCELEROMETER)
+static struct i2c_board_info board_yamaha_i2c_info[] __initdata= {
+	{
+		I2C_BOARD_INFO("accelerometer", 0x38),
+	},
+	{
+		I2C_BOARD_INFO("geomagnetic", 0x2e),
+	},
+};
+#endif
+
 #ifdef CONFIG_BOSCH_BMA250
 static struct i2c_board_info bma250_i2c_info[] __initdata = {
 	{
@@ -456,6 +467,13 @@ void __init msm7627a_sensor_init(void)
                        mxc_i2c0_board_info,
                        ARRAY_SIZE(mxc_i2c0_board_info));
 #endif
+
+#if defined(CONFIG_INPUT_YAS_MAGNETOMETER) && defined(CONFIG_INPUT_YAS_ACCELEROMETER)
+	pr_info("i2c_register_board_info YAMAHA SENSORS.\n");
+	i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
+		board_yamaha_i2c_info,
+		ARRAY_SIZE(board_yamaha_i2c_info));
+#endif	       
 
 #ifdef CONFIG_INPUT_LTR502
 	if (machine_is_msm8625_qrd7() || machine_is_msm7627a_qrd3()) {
