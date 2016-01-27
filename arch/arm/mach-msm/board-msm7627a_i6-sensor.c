@@ -209,6 +209,15 @@ static int mpu3050_gpio_setup(void) {
 }
 #endif
 
+#ifdef CONFIG_MXC_MMA8452
+static struct i2c_board_info mxc_i2c0_board_info[]__initdata={
+       {
+             .type="mma8452",
+             .addr=0x1C,
+       },
+};
+#endif
+
 #ifdef CONFIG_BOSCH_BMA250
 static struct i2c_board_info bma250_i2c_info[] __initdata = {
 	{
@@ -439,6 +448,13 @@ void __init msm7627a_sensor_init(void)
 	i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
 				bmm050_i2c_info,
 				ARRAY_SIZE(bmm050_i2c_info));
+#endif
+
+#ifdef CONFIG_MXC_MMA8452
+       pr_info("i2c_register_board_info_mma8452\n");
+               i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
+                       mxc_i2c0_board_info,
+                       ARRAY_SIZE(mxc_i2c0_board_info));
 #endif
 
 #ifdef CONFIG_INPUT_LTR502
