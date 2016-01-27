@@ -445,10 +445,15 @@ static void ltr558_work_func(struct work_struct *work)
 			ps_changed = 0;
 		}
 
-		if (ps_changed) {
+		if (ps_changed) {			
+#if defined(CONFIG_JSR_I6)
+			tmp_data = g_ltr558_data->ps_state > 3 ? 0 : 5;
+#else
+			tmp_data = g_ltr558_data->ps_state > 2 ? 0 : 5;
+#endif
 			input_report_abs(g_ltr558_data->input,
 					ABS_DISTANCE,
-					g_ltr558_data->ps_state > 2 ? 0 : 5);
+					tmp_data);
 			input_sync(g_ltr558_data->input);
 		}
 	}
