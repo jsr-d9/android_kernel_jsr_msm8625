@@ -1,4 +1,4 @@
-#
+﻿#
 # Input misc drivers configuration
 #
 menuconfig INPUT_MISC
@@ -11,6 +11,11 @@ menuconfig INPUT_MISC
 	  If unsure, say Y.
 
 if INPUT_MISC
+
+source "drivers/input/misc/yamaha/accelerometer/Kconfig"
+source "drivers/input/misc/yamaha/geomagnetic/Kconfig"
+source "drivers/input/misc/yamaha/orientation/Kconfig"
+
 
 config INPUT_88PM860X_ONKEY
 	tristate "88PM860x ONKEY support"
@@ -682,5 +687,12 @@ config INPUT_LTR558
 	default n
 	help
 	  Driver for LTR558 light/proximity sensor.
+
+config INPUT_LTR558_I6
+	tristate "LTR558 light/proximity sensor support"
+	depends on I2C
+	default n
+	help
+	  Driver for I6 LTR558 light/proximity sensor.
 
 endif

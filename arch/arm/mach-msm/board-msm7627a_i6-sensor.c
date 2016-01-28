@@ -20,17 +20,15 @@
 #ifdef CONFIG_AVAGO_APDS990X
 #include <linux/input/apds990x.h>
 #endif
-
+#ifdef	CONFIG_INPUT_LTR558_I6
+#include <linux/input/ltr558.h>
+#endif
 #ifdef CONFIG_MPU_SENSORS_MPU3050
 #include <linux/mpu.h>
 #endif
 
 #ifdef  CONFIG_INPUT_LTR502
 #include <linux/input/ltr502.h>
-#endif
-
-#if defined (CONFIG_I2C) && defined(CONFIG_INPUT_LTR558)
-#include <linux/input/ltr558.h>
 #endif
 
 #ifdef CONFIG_SENSORS_AK8975
@@ -208,7 +206,24 @@ static int mpu3050_gpio_setup(void) {
 	return ret;
 }
 #endif
-
+#ifdef CONFIG_MXC_MMA8452
+static struct i2c_board_info mxc_i2c0_board_info[]__initdata={
+       {
+             .type="mma8452",
+             .addr=0x1C,
+       },
+};
+#endif
+#if defined(CONFIG_INPUT_YAS_MAGNETOMETER) && defined(CONFIG_INPUT_YAS_ACCELEROMETER)
+static struct i2c_board_info board_yamaha_i2c_info[] __initdata= {
+	{
+		I2C_BOARD_INFO("accelerometer", 0x38),
+			},
+	{
+		I2C_BOARD_INFO("geomagnetic", 0x2e),
+	},
+};
+#endif
 #ifdef CONFIG_BOSCH_BMA250
 static struct i2c_board_info bma250_i2c_info[] __initdata = {
 	{
@@ -240,6 +255,26 @@ static struct i2c_board_info bmm050_i2c_info[] __initdata = {
 	},
 };
 #endif
+#if defined (CONFIG_I2C) && defined(CONFIG_INPUT_LTR558_I6)
+
+#ifndef LTR558_INT_GPIO
+#define LTR558_INT_GPIO  17
+#endif
+
+static struct ltr558_platform_data ltr558_pdata = {
+	.intr = LTR558_INT_GPIO
+};
+
+static struct i2c_board_info ltr558_light_i2c_info[] __initdata = {
+	{
+		I2C_BOARD_INFO("ltr558", 0x23),
+		.platform_data = &ltr558_pdata,
+		.irq = MSM_GPIO_TO_INT(LTR558_INT_GPIO),
+	},
+};
+#endif
+
+
 
 #if defined(CONFIG_I2C) && defined(CONFIG_INPUT_LTR502)
 
@@ -271,24 +306,6 @@ static int ltr502_light_gpio_setup(void) {
 
 	return ret;
 }
-#endif
-
-#if defined (CONFIG_I2C) && defined(CONFIG_INPUT_LTR558_I6)
-#ifndef LTR508_INT_GPIO
-#define LTR508_INT_GPIO  17//112
-#endif
-
-static struct ltr558_platform_data ltr558_pdata = {
-	.intr = LTR508_INT_GPIO
-};
-
-static struct i2c_board_info ltr558_light_i2c_info[] __initdata = {
-	{
-		I2C_BOARD_INFO("ltr558", 0x23),
-		.platform_data = &ltr558_pdata,
-		.irq = MSM_GPIO_TO_INT(LTR508_INT_GPIO),
-	},
-};
 #endif
 
 #ifdef  CONFIG_INPUT_LIS3DH
@@ -420,6 +437,12 @@ void __init msm7627a_sensor_init(void)
 	}
 #endif
 
+#ifdef CONFIG_INPUT_LTR558_I6
+		pr_info("i2c_register_board_info LTR558\n");
+		i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
+				ltr558_light_i2c_info,
+				ARRAY_SIZE(ltr558_light_i2c_info));
+#endif
 #ifdef CONFIG_INPUT_LIS3DH
 	if (machine_is_msm8625q_skue()) {
 		lis3dh_acc_gpio_setup();
@@ -441,6 +464,19 @@ void __init msm7627a_sensor_init(void)
 				ARRAY_SIZE(bmm050_i2c_info));
 #endif
 
+
+#ifdef CONFIG_MXC_MMA8452
+       pr_info("i2c_register_board_info_mma8452\n");
+               i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
+                       mxc_i2c0_board_info,
+                       ARRAY_SIZE(mxc_i2c0_board_info));
+#endif
+#if defined(CONFIG_INPUT_YAS_MAGNETOMETER) && defined(CONFIG_INPUT_YAS_ACCELEROMETER)
+		pr_info("i2c_register_board_info YAMAHA SENSORS.\n");
+		i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
+					board_yamaha_i2c_info,
+					ARRAY_SIZE(board_yamaha_i2c_info));
+#endif	       
 #ifdef CONFIG_INPUT_LTR502
 	if (machine_is_msm8625_qrd7() || machine_is_msm7627a_qrd3()) {
 		pr_info("i2c_register_board_info LTR502\n");
@@ -449,13 +485,6 @@ void __init msm7627a_sensor_init(void)
 				ltr502_light_i2c_info,
 				ARRAY_SIZE(ltr502_light_i2c_info));
 	}
-#endif
-
-#ifdef CONFIG_INPUT_LTR558_I6
-	printk("i2c_register_board_info LTR558 weiqingdan\n");
-	i2c_register_board_info(MSM_GSBI1_QUP_I2C_BUS_ID,
-				ltr558_light_i2c_info,
-				ARRAY_SIZE(ltr558_light_i2c_info));
 #endif
 
 #ifdef CONFIG_SENSORS_AK8975

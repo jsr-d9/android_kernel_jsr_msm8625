@@ -1,4 +1,3 @@
-#
 # Makefile for the input misc drivers.
 #
 
@@ -62,5 +61,8 @@ obj-$(CONFIG_INPUT_PMIC8058_VIBRA_MEMLESS) += pmic8058-vib-memless.o
 obj-$(CONFIG_BOSCH_BMA150)              += bma150.o
 obj-$(CONFIG_INPUT_LTR502) 		+= ltr502.o
 obj-$(CONFIG_INPUT_LTR558)		+= ltr558.o
+obj-$(CONFIG_INPUT_LTR558_I6)		+= ltr558_i6.o
+obj-y                  += yamaha/
+
 obj-$(CONFIG_HUAWEI_FEATURE_PROXIMITY_EVERLIGHT_APS_12D)  += aps-12d.o
 obj-$(CONFIG_HUAWEI_FEATURE_PROXIMITY_EVERLIGHT_APS_9900)  += aps-9900.o
