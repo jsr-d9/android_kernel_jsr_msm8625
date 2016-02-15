@@ -980,38 +980,37 @@ static void __devinit acpuclk_hw_init(void)
 
 #ifdef CONFIG_CPU_FREQ_VDD_LEVELS
 
-ssize_t acpuclk_get_vdd_levels_str(char *buf) {
-
-        int i, len = 0;
-
-        if (buf) {
-                mutex_lock(&drv_state.lock);
-//y300-100, for other devices you need change freq table...
-                for (i = 0; pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].a11clk_khz; i++) {
-                        if (pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].use_for_scaling)
-                        len += sprintf(buf + len, "%8u: %8d\n", pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].a11clk_khz, pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].vdd);
-                }
-
-                mutex_unlock(&drv_state.lock);
-        }
-        return len;
+ssize_t acpuclk_get_vdd_levels_str(char *buf)
+{
+	int i, len = 0;
+	if (buf) {
+		mutex_lock(&drv_state.lock);
+		for (i = 0; acpu_freq_tbl[i].a11clk_khz; i++) {
+			if (acpu_freq_tbl[i].use_for_scaling)
+			len += sprintf(buf + len, "%8u: %8d\n", acpu_freq_tbl[i].a11clk_khz, acpu_freq_tbl[i].vdd);
+		}
+		mutex_unlock(&drv_state.lock);
+	}
+	return len;
 }
 
 /* uv */
-void acpuclk_set_vdd(unsigned int khz, int vdd_uv) {
-        int i;
-        printk(KERN_ERR"acpuclk_set_vdd khz: %d, vdd_uv: %d\n", khz, vdd_uv);
-        mutex_lock(&drv_state.lock);
-//y300-100, for other devices you need change freq table...
-        for (i = 0; pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].a11clk_khz; i++) {
-                if ( pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].a11clk_khz == khz)
-                        pll0_960_pll1_196_pll2_1200_pll4_1008_2p0[i].vdd = vdd_uv;
-        }
-
-        mutex_unlock(&drv_state.lock);
+void acpuclk_set_vdd(unsigned int khz, int vdd_uv)
+{
+	int i;
+	unsigned int mhz;
+	mhz = (khz < 5000) ? khz : (khz / 1000);
+	pr_info("%s: MHz: %d, vdd: %d uv\n", __func__, mhz, vdd_uv);
+	mutex_lock(&drv_state.lock);
+	for (i = 0; acpu_freq_tbl[i].a11clk_khz; i++) {
+		if (acpu_freq_tbl[i].a11clk_khz / 1000 == mhz) {
+			acpu_freq_tbl[i].vdd = vdd_uv;
+		}
+	}
+	mutex_unlock(&drv_state.lock);
 }
-#endif        /* CONFIG_CPU_FREQ_VDD_LEVELS */
 
+#endif /* CONFIG_CPU_FREQ_VDD_LEVELS */
 
 static unsigned long acpuclk_7627_get_rate(int cpu)
 {
